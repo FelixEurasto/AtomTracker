@@ -3,6 +3,8 @@ import glob
 import MDAnalysis as mda
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.cross_decomposition import PLSRegression
 
 def main():
     for system_ind, traj_path in enumerate(config.traj_paths):
@@ -46,25 +48,49 @@ def main():
                 for sel in config.other_selections:
                     other_coordinates[sel].append(coordinates[sel])
             
-            traj_fvals = [config.calculate_function(cosmos) for ts in cosmos.trajectory[::config.skip]]
             if config.function:
+                traj_fvals = [config.calculate_function(cosmos) for ts in cosmos.trajectory[::config.skip]]
                 fvals += traj_fvals
             traj_inds += [traj_ind for _ in range(len(traj_fvals))]
         
+        if config.function:
+            fvals = np.array(fvals)
+        traj_inds = np.array(traj_inds)
+
         for sel in config.map_selections:
             sel_in_file_name = sel.replace(" ", "_")
             maps[sel] = np.concatenate(maps[sel], axis=0)
             np.save(f"{config.save_paths[system_ind]}{sel_in_file_name}_maps.npy", maps[sel])
             fig = plotting.make_radial_plot(maps=maps[sel], R_min=config.R_min, R_max=config.R_max, vmax=maps[sel].mean(axis=0).max(), title=f"Mean densities for {sel}")
-            plt.savefig(f"{config.save_paths[system_ind]}{sel_in_file_name}_densities.png", bbox_inches="tight", dpi=300)
+            fig.savefig(f"{config.save_paths[system_ind]}{sel_in_file_name}_densities.png", bbox_inches="tight", dpi=300)
+
+            if config.function:
+                train_maps, test_maps, train_fvals, test_fvals = train_test_split(maps[sel].reshape(maps[sel].shape[0], maps[sel].shape[1]*maps[sel].shape[2]*maps[sel].shape[3]),
+                                                                                  fvals, test_size=.25)
+                pls_1d = PLSRegression(n_components=1).fit(train_maps, train_fvals)
+                pls_1d_score = pls_1d.score(test_maps, test_fvals)
+                pls_1d_projected = pls_1d.transform(test_maps)
+
+                pls_2d = PLSRegression(n_components=2).fit(train_maps, train_fvals)
+                pls_2d_score = pls_2d.score(test_maps, test_fvals)
+                pls_2d_projected = pls_2d.transform(test_maps)
+
+                fig, ax = plt.subplots(1,2,figsize=(6,3),layout="constrained")
+                ax[0].hist(pls_1d_projected, bins=30)
+                ax[1].scatter(pls_2d_projected[:,0], pls_2d_projected[:,1], c=test_fvals, edgecolors="k")
+                ax[0].set_title(f"1 Component PLS (R^2: {pls_1d_score:.3})")
+                ax[1].set_title(f"2 Component PLS (R^2: {pls_2d_score:.3})")
+                fig.savefig(f"{config.save_paths[system_ind]}{sel_in_file_name}_pls_projections.png", bbox_inches="tight", dpi=300)
+        
+        print(f"Saving arrays into {config.save_paths[system_ind]} ...")
         if config.other_selections:
             for sel in config.other_selections:
                 sel_in_file_name = sel.replace(" ", "_")
                 other_coordinates[sel] = np.concatenate(other_coordinates[sel], axis=0)
                 np.save(f"{config.save_paths[system_ind]}{sel_in_file_name}_coordinates.npy", other_coordinates[sel])
         if config.function:
-            np.save(f"{config.save_paths[system_ind]}function_values.npy", np.array(fvals))
-        np.save(f"{config.save_paths[system_ind]}traj_inds.npy", np.array(traj_inds)) 
+            np.save(f"{config.save_paths[system_ind]}function_values.npy", fvals)
+        np.save(f"{config.save_paths[system_ind]}traj_inds.npy", traj_inds) 
 
 
 if __name__ == "__main__":
