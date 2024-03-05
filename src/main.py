@@ -16,7 +16,8 @@ def main():
             continue
         
         maps = dict([(sel, []) for sel in config.map_selections])
-        fvals = []
+        if config.function:
+            fvals = []
         traj_inds = []
         if config.other_selections:
             other_coordinates = dict([(sel, []) for sel in config.other_selections])
@@ -44,9 +45,10 @@ def main():
             if config.other_selections:
                 for sel in config.other_selections:
                     other_coordinates[sel].append(coordinates[sel])
-                
+            
             traj_fvals = [config.calculate_function(cosmos) for ts in cosmos.trajectory[::config.skip]]
-            fvals += traj_fvals
+            if config.function:
+                fvals += traj_fvals
             traj_inds += [traj_ind for _ in range(len(traj_fvals))]
         
         for sel in config.map_selections:
@@ -60,7 +62,8 @@ def main():
                 sel_in_file_name = sel.replace(" ", "_")
                 other_coordinates[sel] = np.concatenate(other_coordinates[sel], axis=0)
                 np.save(f"{config.save_paths[system_ind]}{sel_in_file_name}_coordinates.npy", other_coordinates[sel])
-        np.save(f"{config.save_paths[system_ind]}function_values.npy", np.array(fvals))
+        if config.function:
+            np.save(f"{config.save_paths[system_ind]}function_values.npy", np.array(fvals))
         np.save(f"{config.save_paths[system_ind]}traj_inds.npy", np.array(traj_inds)) 
 
 

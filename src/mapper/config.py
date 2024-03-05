@@ -16,7 +16,7 @@ save_paths = [
 ]
 
 map_selections = ["resname CHL1"] # Selections for which maps are calculated
-other_selections = ["name CA"] # Selections for which coordinates corresponding to maps are calculated
+other_selections = ["name CA"] # Selections for which coordinates corresponding to maps are calculated. Set to None if not needed.
 
 
 # Reference structure used for alignment at each timestep of each simulation. If None, each trajectoyr will be aligned with it's first frame.
@@ -36,7 +36,8 @@ normalization = "within"
 skip = 50 # Number of frames to skip 
 
 
-# Define function that is calculated for the corresponding position maps
+# Define function that is calculated for the corresponding position maps.
+# If you do not need this, just set function = None below. 
 def calculate_function(universe):
     import scipy
     pairs = [(23, 297), (48, 87), (92, 119), (196, 241), (265, 277)]
@@ -54,4 +55,5 @@ def calculate_function(universe):
     return a100
 
 
+function = calculate_function # Set function = None if you do not wish to calculate any function
 
