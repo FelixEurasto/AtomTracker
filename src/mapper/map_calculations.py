@@ -84,34 +84,37 @@ def map_to_grid_points(coordinates, R_vals, theta_vals, z_vals):
     return R_closest, theta_closest, z_closest
 
 def create_maps(X, R_min, R_max, n_R, n_theta, n_z, normalization="within"):
-    z_coordinates = X[:,:,2]
-    z_min, z_max = z_coordinates.min(), z_coordinates.max()
-    maps = []
-    R_grids, theta_grids, z_grids = make_cylindrical_grid(R_min=R_min, R_max=R_max, z_min=z_min,
-                                                        z_max=z_max, n_R=n_R + 1,
-                                                        n_theta=n_theta, n_z=n_z)
-    for coords in X:
-        frame_map = np.zeros((1, n_R, n_theta, n_z))
-        R_coordinates, theta_coordinates = cartesian_to_cylindrical(coords[:,0], coords[:,1])
-        cylindrical_coordinates = np.concatenate([R_coordinates.reshape(-1,1),
-                                                  theta_coordinates.reshape(-1,1),
-                                                  coords[:,2].reshape(-1,1)], axis=1)
-        R_closest, theta_closest, z_closest = map_to_grid_points(cylindrical_coordinates, R_grids.reshape(-1,1),
-                                                                 theta_grids.reshape(-1,1), z_grids.reshape(-1,1))
-        R_within_range = np.where(R_closest != n_R)[0]
-        np.add.at(frame_map, (0, R_closest[R_within_range],
-                              theta_closest[R_within_range],
-                              z_closest[R_within_range]), 1)
-        if normalization == "within":
-            if len(R_within_range) != 0:
-                frame_map /= len(R_within_range)
-        elif normalization == "all":
-            frame_map /= len(coords)
-        else:
-            print(f"Normalization {normalization} not known! Use either 'within' or 'all'.")
-        maps.append(frame_map)
-    maps = np.concatenate(maps, axis=0)
-
-    return maps
+    
+    if X.size != 0:
+        z_coordinates = X[:,:,2]
+        z_min, z_max = z_coordinates.min(), z_coordinates.max()
+        maps = []
+        R_grids, theta_grids, z_grids = make_cylindrical_grid(R_min=R_min, R_max=R_max, z_min=z_min,
+                                                            z_max=z_max, n_R=n_R + 1,
+                                                            n_theta=n_theta, n_z=n_z)
+        for coords in X:
+            frame_map = np.zeros((1, n_R, n_theta, n_z))
+            R_coordinates, theta_coordinates = cartesian_to_cylindrical(coords[:,0], coords[:,1])
+            cylindrical_coordinates = np.concatenate([R_coordinates.reshape(-1,1),
+                                                    theta_coordinates.reshape(-1,1),
+                                                    coords[:,2].reshape(-1,1)], axis=1)
+            R_closest, theta_closest, z_closest = map_to_grid_points(cylindrical_coordinates, R_grids.reshape(-1,1),
+                                                                    theta_grids.reshape(-1,1), z_grids.reshape(-1,1))
+            R_within_range = np.where(R_closest != n_R)[0]
+            np.add.at(frame_map, (0, R_closest[R_within_range],
+                                theta_closest[R_within_range],
+                                z_closest[R_within_range]), 1)
+            if normalization == "within":
+                if len(R_within_range) != 0:
+                    frame_map /= len(R_within_range)
+            elif normalization == "all":
+                frame_map /= len(coords)
+            else:
+                print(f"Normalization {normalization} not known! Use either 'within' or 'all'.")
+            maps.append(frame_map)
+        maps = np.concatenate(maps, axis=0)
+        return maps
+    else:
+        return None
 
 

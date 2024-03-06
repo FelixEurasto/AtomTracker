@@ -8,14 +8,13 @@ def calculate_positions(universe, map_selections, use_com=False, skip=1,
                         centering_selection=None, alignment_selection=None):
     coordinates = dict([(sel, []) for sel in map_selections])
     if use_com:
-        atoms = dict([(sel, universe.select_atoms(sel).center_of_mass(compound="residues")) for sel in selections])
+        atoms = dict([(sel, universe.select_atoms(sel).center_of_mass(compound="residues")) for sel in map_selections])
     else:
         atoms = dict([(sel, universe.select_atoms(sel)) for sel in map_selections])
     if other_selections:
         for sel in other_selections:
             coordinates[sel] = []
             atoms[sel] = universe.select_atoms(sel)
-
     if reference_structure:
         ref_struct = mda.Universe(reference_structure)
     else:

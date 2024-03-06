@@ -4,29 +4,29 @@
 traj_paths = [
     "/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/chol-sdpc/a100/epoch*/rep*/solu_memb_centered.xtc",
     "/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/chol/a100/epoch*/rep*/solu_memb_centered.xtc",
-    #"/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/sdpc/a100/epoch*/rep*/solu_memb_centered.xtc",
-    #"/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/popc/a100/epoch*/rep*/solu_memb_centered.xtc"
+    "/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/sdpc/a100/epoch*/rep*/solu_memb_centered.xtc",
+    "/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/popc/a100/epoch*/rep*/solu_memb_centered.xtc"
 ]
 
 # Define list of gro/pdb file paths in corresponding order with trajectory dirs.
 gro_paths = [
     "/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/chol-sdpc/a100/epoch01/rep01/solu_memb.gro",
     "/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/chol/a100/epoch01/rep01/solu_memb.gro",
-    #"/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/sdpc/a100/epoch01/rep01/solu_memb.gro",
-    #"/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/popc/a100/epoch01/rep01/solu_memb.gro"
+    "/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/sdpc/a100/epoch01/rep01/solu_memb.gro",
+    "/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/popc/a100/epoch01/rep01/solu_memb.gro"
 ]
 
 # Define list of paths to which position data will be saved.
 save_paths = [
     "/wrk/eurastof/mapper/data/chol-sdpc/",
     "/wrk/eurastof/mapper/data/chol/",
-    #"/wrk/eurastof/mapper/data/sdpc/",
-    #"/wrk/eurastof/mapper/data/popc/",
+    "/wrk/eurastof/mapper/data/sdpc/",
+    "/wrk/eurastof/mapper/data/popc/"
 ]
 
 ########### POSITION MAP SETTINGS ###########
 
-map_selections = ["resname CHL1"] # Selections for which maps are calculated
+map_selections = ["resname CHL1", "resname SDPC", "resname POPC"] # Selections for which maps are calculated
 other_selections = ["name CA"] # Selections for which coordinates corresponding to maps are calculated. Set to None if not needed.
 
 # Reference structure used for alignment at each timestep of each simulation. If None, each trajectoyr will be aligned with it's first frame.
@@ -36,14 +36,14 @@ centering_selection = "protein" # selection whose COM is centered to origin at e
 
 R_min = 0 # Minimum radial distance from origin in xy-plane
 R_max = 30 # Maximum radial distance from origin in xy-plane
-n_R = 12 # Number of grid points in R-direction
-n_z = 12 # Number of grid points in z-direction
-n_theta = 12 # Number of grid points in theta-direction
+n_R = 30 # Number of grid points in R-direction
+n_z = 30 # Number of grid points in z-direction
+n_theta = 30 # Number of grid points in theta-direction
 use_com = False # Whether to use the COMs of selections when calculating position maps
 # Normalization method. 'within' normalizes each frame's map to sum to 1. 'all' normalizes each frame's map by the total number of atoms in the map selection.
 normalization = "within" 
 
-skip = 50 # Number of frames to skip 
+skip = 30 # Number of frames to skip 
 
 
 ########### FUNCTION DEFINITION ###########
@@ -68,6 +68,4 @@ def calculate_function(universe):
 
 
 function = calculate_function # Set function = None if you do not wish to calculate any function
-
-
 
