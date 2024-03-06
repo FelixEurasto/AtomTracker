@@ -3,7 +3,7 @@
 # Define list of paths where the trajectories are. Can use '*' to select recursively.
 traj_paths = [
     #"/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/chol-sdpc/a100/epoch*/rep*/solu_memb_centered.xtc",
-    "/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/chol/a100/epoch01/rep*/solu_memb_centered.xtc",
+    #"/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/chol/a100/epoch*/rep*/solu_memb_centered.xtc",
     "/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/sdpc/a100/epoch*/rep*/solu_memb_centered.xtc",
     "/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/popc/a100/epoch*/rep*/solu_memb_centered.xtc"
 ]
@@ -11,7 +11,7 @@ traj_paths = [
 # Define list of gro/pdb file paths in corresponding order with trajectory dirs.
 gro_paths = [
     #"/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/chol-sdpc/a100/epoch01/rep01/solu_memb.gro",
-    "/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/chol/a100/epoch01/rep01/solu_memb.gro",
+    #"/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/chol/a100/epoch01/rep01/solu_memb.gro",
     "/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/sdpc/a100/epoch01/rep01/solu_memb.gro",
     "/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/popc/a100/epoch01/rep01/solu_memb.gro"
 ]
@@ -19,7 +19,7 @@ gro_paths = [
 # Define list of paths to which position data will be saved.
 save_paths = [
     #"/wrk/eurastof/mapper/data/chol-sdpc/",
-    "/wrk/eurastof/mapper/data/chol/",
+    #"/wrk/eurastof/mapper/data/chol/",
     "/wrk/eurastof/mapper/data/sdpc/",
     "/wrk/eurastof/mapper/data/popc/"
 ]
@@ -43,7 +43,7 @@ use_com = False # Whether to use the COMs of selections when calculating positio
 # Normalization method. 'within' normalizes each frame's map to sum to 1. 'all' normalizes each frame's map by the total number of atoms in the map selection.
 normalization = "within" 
 
-skip = 30 # Number of frames to skip 
+skip = 10 # Number of frames to skip 
 
 ########### FUNCTION DEFINITION ###########
 

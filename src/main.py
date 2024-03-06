@@ -5,9 +5,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.cross_decomposition import PLSRegression
+import os
 
 def main():
     for system_ind, traj_path in enumerate(config.traj_paths):
+        save_path = config.save_paths[system_ind]
+        if not os.path.isdir(save_path):
+            os.mkdir(save_path)
         print(f"Extracting data from trajectories in '{traj_path}' ...")
         try:
             gro = glob.glob(config.gro_paths[system_ind])[0]
@@ -62,17 +66,15 @@ def main():
 
         for sel in config.map_selections:
             sel_in_file_name = sel.replace(" ", "_")
-            try:
+            if len(maps[sel]) > 0:
                 maps[sel] = np.concatenate(maps[sel], axis=0)
                 np.save(f"{config.save_paths[system_ind]}{sel_in_file_name}_maps.npy", maps[sel])
                 fig = plotting.make_radial_plot(maps=maps[sel], R_min=config.R_min, R_max=config.R_max, vmax=maps[sel].mean(axis=0).max(), title=f"Mean densities for {sel}")
                 fig.savefig(f"{config.save_paths[system_ind]}{sel_in_file_name}_densities.png", bbox_inches="tight", dpi=300)
-            except:
-                print(f"Selection {sel} not found in this system!")
-                continue
+    
 
         if config.function:
-            print("Fitting PLS models ...")
+            print("\nFitting PLS models ...")
             # PLS models for every selection in 'map_selections'
             for sel in config.map_selections:
                 sel_in_file_name = sel.replace(" ", "_")
