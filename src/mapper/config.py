@@ -2,15 +2,15 @@
 
 # Define list of paths where the trajectories are. Can use '*' to select recursively.
 traj_paths = [
-    "/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/chol-sdpc/a100/epoch*/rep*/solu_memb_centered.xtc",
-    "/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/chol/a100/epoch*/rep*/solu_memb_centered.xtc",
+    #"/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/chol-sdpc/a100/epoch*/rep*/solu_memb_centered.xtc",
+    "/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/chol/a100/epoch01/rep*/solu_memb_centered.xtc",
     "/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/sdpc/a100/epoch*/rep*/solu_memb_centered.xtc",
     "/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/popc/a100/epoch*/rep*/solu_memb_centered.xtc"
 ]
 
 # Define list of gro/pdb file paths in corresponding order with trajectory dirs.
 gro_paths = [
-    "/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/chol-sdpc/a100/epoch01/rep01/solu_memb.gro",
+    #"/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/chol-sdpc/a100/epoch01/rep01/solu_memb.gro",
     "/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/chol/a100/epoch01/rep01/solu_memb.gro",
     "/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/sdpc/a100/epoch01/rep01/solu_memb.gro",
     "/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/popc/a100/epoch01/rep01/solu_memb.gro"
@@ -18,7 +18,7 @@ gro_paths = [
 
 # Define list of paths to which position data will be saved.
 save_paths = [
-    "/wrk/eurastof/mapper/data/chol-sdpc/",
+    #"/wrk/eurastof/mapper/data/chol-sdpc/",
     "/wrk/eurastof/mapper/data/chol/",
     "/wrk/eurastof/mapper/data/sdpc/",
     "/wrk/eurastof/mapper/data/popc/"
@@ -29,7 +29,7 @@ save_paths = [
 map_selections = ["resname CHL1", "resname SDPC", "resname POPC"] # Selections for which maps are calculated
 other_selections = ["name CA"] # Selections for which coordinates corresponding to maps are calculated. Set to None if not needed.
 
-# Reference structure used for alignment at each timestep of each simulation. If None, each trajectoyr will be aligned with it's first frame.
+# Reference structure used for alignment at each timestep of each simulation. If None, each trajectory will be aligned with its first frame.
 reference_structure = "/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/chol-sdpc/a100/epoch01/rep01/solu_memb.gro"
 alignment_selection = "name CA" # selection used to align each ts to reference structure
 centering_selection = "protein" # selection whose COM is centered to origin at each frame
@@ -44,7 +44,6 @@ use_com = False # Whether to use the COMs of selections when calculating positio
 normalization = "within" 
 
 skip = 30 # Number of frames to skip 
-
 
 ########### FUNCTION DEFINITION ###########
 
