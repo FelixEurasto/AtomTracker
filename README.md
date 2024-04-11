@@ -39,6 +39,8 @@ Next, define all settings needed for the calculations of the density maps.
 | `skip*` | Number of frames to skip when computing the density maps | 10 |
 
 
+Along with the density maps, you may wish to evaluate some function related to the system at each frame. This is done by assigning the `function` variable to some function. If `function` is `None`, no function is evaluated when computing the maps. 
+
 
 
 
