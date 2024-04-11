@@ -24,11 +24,11 @@ Next, define all settings needed for the calculations of the density maps.
 
 | Variable | Description | Default value |
 | --- | - | - |
-| `map_selections` | List of paths from which to fetch .xtc files |  - |
-| `other_selections` | List of paths from which to fetch corresponding .gro/.pdb files | - |
-| `reference_structure` | List of paths to which the corresponding results are saved | - |
-| `alignment_selection` |  |  |
-| `fit_structures` |  |  |
+| `map_selections` | List of MDAnalysis selection strings for which density maps are calculated |  - |
+| `other_selections` | List of MDAnalysis selection strings for which coordinates are saved at every frame | None |
+| `reference_structure` | Path to .gro/.pdb file which will be used as reference structure | None |
+| `alignment_selection` | MDAnalysis selection string that is used to align each frame to `reference_structure` | None |
+| `fit_structures` | Whether to use `alignment_selection` to fit every frame to `reference_structure` |  |
 | `centering_selection` |  |  |
 | `R_min` |  |  |
 | `R_max` |  |  |
