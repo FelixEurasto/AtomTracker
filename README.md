@@ -56,6 +56,7 @@ To make density, movies you need to define the following variables:
 | `function_min_and_max*` | Tuple containing the range of function values for which atom densities are interpolated (there will be `movie_n_frames` interpolations) | (0,1) |
 
 
+![](testing.gif)
 
 
 
