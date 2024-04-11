@@ -20,16 +20,16 @@ First, define the directory paths from which the simulation trajectories and cor
 | `save_paths` | List of paths to which the corresponding results are saved | - |
 
 
-Next, define all settings needed for the calculations of the density maps.
+Next, define all settings needed for the calculations of the density maps. Variables with `*` are required.
 
 | Variable | Description | Default value |
 | --- | - | - |
-| `map_selections` | List of MDAnalysis selection strings for which density maps are calculated |  - |
+| `map_selections`* | List of MDAnalysis selection strings for which density maps are calculated |  - |
 | `other_selections` | List of MDAnalysis selection strings for which coordinates are saved at every frame | None |
 | `reference_structure` | Path to .gro/.pdb file which will be used as reference structure | None |
 | `alignment_selection` | MDAnalysis selection string that is used to align each frame to `reference_structure` | None |
-| `fit_structures` | Whether to use `alignment_selection` to fit every frame to `reference_structure` |  |
-| `centering_selection` |  |  |
+| `fit_structures` | Whether to use `alignment_selection` to fit every frame to `reference_structure` | False |
+| `centering_selection`* | MDAnalysis string of structure whose center of mass is shifted to the origin on each frame | - |
 | `R_min` |  |  |
 | `R_max` |  |  |
 | `n_R` |  |  |
