@@ -30,7 +30,14 @@ Next, define all settings needed for the calculations of the density maps.
 | `alignment_selection` |  |  |
 | `fit_structures` |  |  |
 | `centering_selection` |  |  |
-| `` |  |  |
+| `R_min` |  |  |
+| `R_max` |  |  |
+| `n_R` |  |  |
+| `n_theta` |  |  |
+| `n_z` |  |  |
+| `normalization` |  |  |
+| `skip` |  |  |
+
 
 
 
