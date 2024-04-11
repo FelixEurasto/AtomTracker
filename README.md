@@ -9,7 +9,7 @@
 
 ## Usage
 
-All of the required settings are defined in /src/AtomTracker/config.py
+All of the required settings are defined in /src/AtomTracker/config.py. Variables with `*` are required.
 
 First, define the directory paths from which the simulation trajectories and corresponding .gro/.pdb files are fetched.
 
@@ -20,7 +20,7 @@ First, define the directory paths from which the simulation trajectories and cor
 | `save_paths` | List of paths to which the corresponding results are saved | - |
 
 
-Next, define all settings needed for the calculations of the density maps. Variables with `*` are required.
+Next, define all settings needed for the calculations of the density maps.
 
 | Variable | Description | Default value |
 | --- | - | - |
