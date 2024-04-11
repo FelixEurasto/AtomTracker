@@ -33,9 +33,9 @@ Next, define all settings needed for the calculations of the density maps.
 | `R_min*` | Minimum radial distance (in Angstroms) from the COM of `centering_selection` for which atoms are considered in the density maps | 0 |
 | `R_max*` | Maximum radial distance (in Angstroms) from the COM of `centering_selection` for which atoms are considered in the density maps | - |
 | `n_R*` | Number of grid points in the radial direction | - |
-| `n_theta*` | Number of grid points in the $\theta$-direction |  |
+| `n_theta*` | Number of grid points in the (azimuthal) $\theta$-direction |  |
 | `n_z*` | Number of grid points in the z-direction |  |
-| `normalization` |  |  |
+| `normalization` | How to normalize density values. `"all"` normalizes by dividing by the total number of atoms in the map selection. `"within"` divides by number of atoms seen within the radius limits. If `None`, no normalization is done.  |  |
 | `skip` |  |  |
 
 
