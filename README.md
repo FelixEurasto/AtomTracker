@@ -1,5 +1,6 @@
 # A tool to build density maps of atoms from MD simulations
 
+![alt text](http://url/to/img.png)
 
 ## Required Python Modules
 - NumPy
@@ -60,4 +61,4 @@ Making movies might take some minutes per map selection, of course depending on 
 Below is an example of these movies. Here cholesterol densities around the beta-2 adrenergic receptor are being interpolated for different values of the $\mathrm{A}^{100}$ activation index.
 
 
-
+![alt text](http://url/to/img.png)
