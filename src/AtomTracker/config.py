@@ -2,7 +2,7 @@
 
 # Define list of paths where the trajectories are. Can use '*' to select recursively.
 traj_paths = [
-    "/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/chol-sdpc/a100/epoch01/rep*/solu_memb_centered.xtc",
+    "/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/chol-sdpc/a100/epoch*/rep*/solu_memb_centered.xtc",
     #"/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/chol/a100/epoch*/rep*/solu_memb_centered.xtc",
     #"/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/sdpc/a100/epoch*/rep*/solu_memb_centered.xtc",
     #"/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/popc/a100/epoch*/rep*/solu_memb_centered.xtc"
@@ -18,13 +18,13 @@ gro_paths = [
 
 # Define list of paths to which position data will be saved.
 save_paths = [
-    "/wrk/eurastof/mapper/data/testing/",
+    "/wrk/eurastof/AtomTracker/data/testing/",
     #"/wrk/eurastof/mapper/data/chol-volum-norm-fit-headgroups/",
     #"/wrk/eurastof/mapper/data/sdpc-volum-norm-fit-headgroups/",
     #"/wrk/eurastof/mapper/data/popc-volum-norm-fit-headgroups/"
 ]
 
-########### POSITION MAP SETTINGS ###########
+########### DENSITY MAP SETTINGS ###########
 
 map_selections = ["resname CHL1", "resname SDPC", "resname POPC"] # Selections for which maps are calculated
 other_selections = ["protein and not name H and not type H", "name CA"] # Selections for which coordinates corresponding to maps are calculated. Set to None if not needed.
@@ -33,16 +33,17 @@ other_selections = ["protein and not name H and not type H", "name CA"] # Select
 reference_structure = "/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/chol-sdpc/a100/epoch01/rep01/solu_memb.gro"
 alignment_selection = "name CA and not resid 199-235 and not resid 298-311 and not resid 265-275 and not resid 135-165 and not resid 105-115 and not resid 60-75 and not resid 29-36" # selection used to align each ts to reference structure
 fit_structures = True # Whether to align frames to reference_structure, using alignment_selection.
-centering_selection = "protein" # selection whose COM is centered to origin at each frame
+centering_selection = "protein and not name H and not type H" # selection whose COM is centered to origin at each frame
 
 R_min = 0 # Minimum radial distance from origin in xy-plane
 R_max = 30 # Maximum radial distance from origin in xy-plane
 n_R = 30 # Number of grid points in R-direction
-n_z = 30 # Number of grid points in z-direction
 n_theta = 30 # Number of grid points in theta-direction
-# Normalization method. 'within' normalizes each frame's map by the number of atoms within R_max. 'all' normalizes each frame's map by the total number of atoms in the map selection.
+n_z = 30 # Number of grid points in z-direction
+# Normalization method. 'within' normalizes each frame's map by the number of atoms within R_max.
+# 'all' normalizes each frame's map by the total number of atoms in the map selection.
+# If None, no normalization based on atom count is performed
 normalization = "all"
-
 skip = 10 # Number of frames to skip 
 
 ########### FUNCTION DEFINITION ###########
@@ -68,3 +69,9 @@ def calculate_function(universe):
 
 function = calculate_function # Set function = None if you do not wish to calculate any function
 
+### PLS MOVIE CREATION ###
+
+create_movies = True # Whether to create PLS movies
+movie_n_frames = 500 # Number of frames in created movies
+movie_length = 5 # Length of created movies in seconds
+function_min_and_max = (-50, 50) # Range of function values at which atom densities are interpolated

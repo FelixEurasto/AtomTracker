@@ -1,4 +1,4 @@
-from AtomTracker import map_calculations, position_calculations, config, plotting
+from AtomTracker import map_calculations, position_calculations, config, plotting, movie_making
 import glob
 import MDAnalysis as mda
 from MDAnalysis.analysis import align
@@ -12,7 +12,7 @@ def main():
     for system_ind, traj_path in enumerate(config.traj_paths):
         save_path = config.save_paths[system_ind]
         if not os.path.isdir(save_path):
-            print(f"Directory {save_path} not found, creating it now...")
+            print(f"Directory {save_path} not found, creating it now ...")
             os.mkdir(save_path)
         print(f"Extracting data from trajectories in '{traj_path}' ...")
         try:
@@ -80,70 +80,24 @@ def main():
             if config.function:
                 traj_fvals = [config.calculate_function(cosmos) for ts in cosmos.trajectory[::config.skip]]
                 fvals += traj_fvals
-            traj_inds += [traj_ind for _ in range(len(traj_fvals))]
+            traj_inds += [traj_ind for _ in range(len(coordinates))]
         
         if config.function:
             fvals = np.array(fvals)
         traj_inds = np.array(traj_inds)
 
+
+        print(f"Saving arrays and figures into {save_path} ...")
+        
         for sel in config.map_selections:
             sel_in_file_name = sel.replace(" ", "_")
             if len(maps[sel]) > 0:
                 maps[sel] = np.concatenate(maps[sel], axis=0)
                 np.save(f"{save_path}{sel_in_file_name}_maps.npy", maps[sel])
-                fig = plotting.make_radial_plot(maps=maps[sel], R_min=config.R_min, R_max=config.R_max, vmax=maps[sel].mean(axis=0).max()/10, title=f"Mean densities for {sel}")
-                fig.savefig(f"{save_path}{sel_in_file_name}_densities.png", bbox_inches="tight", dpi=300)
-    
+                fig = plotting.make_radial_plot(maps=maps[sel], R_min=config.R_min, R_max=config.R_max,
+                                                vmax=maps[sel].mean(axis=0).max()/2, title=f"Mean densities for {sel}")
+                fig.savefig(f"{save_path}{sel_in_file_name}_densities.png", bbox_inches="tight", dpi=200)
 
-        if config.function:
-            print("\nFitting PLS models ...")
-            # PLS models for every selection in 'map_selections'
-            for sel in config.map_selections:
-                sel_in_file_name = sel.replace(" ", "_")
-                if np.array(maps[sel]).size != 0:
-                    train_maps, test_maps, train_fvals, test_fvals = train_test_split(maps[sel].reshape(maps[sel].shape[0],
-                                                                                                        maps[sel].shape[1]*maps[sel].shape[2]*maps[sel].shape[3]),
-                                                                                        fvals, test_size=.25)
-                    pls_1d = PLSRegression(n_components=1).fit(train_maps, train_fvals)
-                    pls_1d_score = pls_1d.score(test_maps, test_fvals)
-                    pls_1d_projected = pls_1d.transform(test_maps)
-
-                    pls_2d = PLSRegression(n_components=2).fit(train_maps, train_fvals)
-                    pls_2d_score = pls_2d.score(test_maps, test_fvals)
-                    pls_2d_projected = pls_2d.transform(test_maps)
-
-                    fig, ax = plt.subplots(1,2,figsize=(6,3), layout="constrained")
-                    ax[0].hist(pls_1d_projected, bins=30)
-                    s = ax[1].scatter(pls_2d_projected[:,0], pls_2d_projected[:,1], c=test_fvals, s=5)
-                    ax[0].set_title(f"1 Component PLS (R^2: {pls_1d_score:.3})")
-                    ax[1].set_title(f"2 Component PLS (R^2: {pls_2d_score:.3})")
-                    fig.colorbar(mappable=s, label="Function value")
-                    fig.savefig(f"{save_path}{sel_in_file_name}_pls_projections.png", bbox_inches="tight", dpi=300)
-                else:
-                    continue
-            # Combined PLS model
-            sel_in_file_name = "_".join([sel.replace(" ", "_") for sel in config.map_selections if np.array(maps[sel]).size != 0])
-            combined_maps = np.concatenate([maps[sel] for sel in config.map_selections if np.array(maps[sel]).size != 0], axis=1)
-            combined_maps = combined_maps.reshape(combined_maps.shape[0], combined_maps.shape[1]*combined_maps.shape[2]*combined_maps.shape[3])
-            train_maps, test_maps, train_fvals, test_fvals = train_test_split(combined_maps, fvals, test_size=.5)
-
-            pls_1d = PLSRegression(n_components=1).fit(train_maps, train_fvals)
-            pls_1d_score = pls_1d.score(test_maps, test_fvals)
-            pls_1d_projected = pls_1d.transform(test_maps)
-
-            pls_2d = PLSRegression(n_components=2).fit(train_maps, train_fvals)
-            pls_2d_score = pls_2d.score(test_maps, test_fvals)
-            pls_2d_projected = pls_2d.transform(test_maps)
-
-            fig, ax = plt.subplots(1,2,figsize=(8,3),layout="constrained")
-            ax[0].hist(pls_1d_projected, bins=30)
-            s = ax[1].scatter(pls_2d_projected[:,0], pls_2d_projected[:,1], c=test_fvals, s=5)
-            fig.colorbar(mappable=s, label="Function value")
-            ax[0].set_title(f"1 Component PLS (R^2: {pls_1d_score:.3})")
-            ax[1].set_title(f"2 Component PLS (R^2: {pls_2d_score:.3})")
-            fig.savefig(f"{save_path}{sel_in_file_name}_pls_projections.png", bbox_inches="tight", dpi=300)
-        
-        print(f"Saving arrays into {save_path} ...")
         if config.other_selections:
             for sel in config.other_selections:
                 sel_in_file_name = sel.replace(" ", "_")
@@ -151,7 +105,54 @@ def main():
                 np.save(f"{save_path}{sel_in_file_name}_coordinates.npy", other_coordinates[sel])
         if config.function:
             np.save(f"{save_path}function_values.npy", fvals)
-        np.save(f"{save_path}traj_inds.npy", traj_inds) 
+        np.save(f"{save_path}traj_inds.npy", traj_inds)
+
+        if config.create_movies:
+            if not config.function:
+                print("No function defined, unable to make movies!")
+                continue
+            
+            fval_min, fval_max = config.function_min_and_max
+            fvals_to_interpolate = np.linspace(fval_min, fval_max, config.movie_n_frames)
+            movie_interval = 1e3*config.movie_length / config.movie_n_frames
+
+            """for sel in config.map_selections: # interpolations using single selection models
+                sel_in_file_name = sel.replace(" ", "_")
+                if len(maps[sel]) > 0:
+                    print(f"Making PLS movies for selection '{sel}' ...")
+                    X = maps[sel].reshape(len(fvals), -1)
+                    train_X, test_X, train_fvals, test_fvals = train_test_split(X, fvals, test_size=.33)
+                    pls_model = PLSRegression(n_components=1).fit(train_X, train_fvals)
+                    model_score = pls_model.score(test_X, test_fvals)
+                    density_interpolations = pls_model.inverse_transform(fvals_to_interpolate).reshape((len(fvals_to_interpolate),
+                                                                                                           config.n_R,
+                                                                                                           config.n_theta,
+                                                                                                           config.n_z))
+                    movie = movie_making.density_movie(true_densities=maps[sel], density_interpolations=density_interpolations, function_values=fvals_to_interpolate,
+                                                       R_min=config.R_min, R_max=config.R_max, vmax=maps[sel].mean(axis=0).max(),
+                                                       interval=movie_interval, save_file=f"{save_path}{sel_in_file_name}_pls_movie.mp4",
+                                                       title=f"{sel}, " +  r"$\mathrm{R}^2$" + f" of model: {model_score:.3}")"""
+                    
+            combined_maps = np.concatenate([maps[sel] for sel in config.map_selections if len(maps[sel]) > 0], axis=1).reshape(len(fvals), -1)
+            train_X, test_X, train_fvals, test_fvals = train_test_split(combined_maps, fvals, test_size=.33)
+            combined_pls_model = PLSRegression(n_components=1).fit(train_X, train_fvals)
+            model_score = combined_pls_model.score(test_X, test_fvals)
+            density_interpolations = combined_pls_model.inverse_transform(fvals_to_interpolate)
+     
+            single_map_dim = maps[config.map_selections[0]].shape[1] * maps[config.map_selections[0]].shape[2] * maps[config.map_selections[0]].shape[3]
+            for i, sel in enumerate(config.map_selections):
+                print(f"Making PLS movies for selection '{sel}' ...")
+                sel_in_file_name = sel.replace(" ", "_")
+                sel_interpolations = density_interpolations[:,i*single_map_dim:(i+1)*single_map_dim].reshape((len(fvals_to_interpolate),
+                                                                                                                config.n_R,
+                                                                                                                config.n_theta,
+                                                                                                                config.n_z))
+                movie = movie_making.density_movie(true_densities=maps[sel], density_interpolations=sel_interpolations, function_values=fvals_to_interpolate,
+                                                    R_min=config.R_min, R_max=config.R_max, vmax=maps[sel].mean(axis=0).max()/2,
+                                                    interval=movie_interval, save_file=f"{save_path}combined_model_{sel_in_file_name}_pls_movie.mp4",
+                                                    title=f"{sel}, " +  r"$\mathrm{R}^2$" + f" of model: {model_score:.3}")
+            
+
 
 
 if __name__ == "__main__":

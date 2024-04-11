@@ -94,14 +94,14 @@ def create_maps(X, R_grids, theta_grids, z_grids, volumes, normalization="within
     if X.size != 0:
         maps = []
         for coords in X:
-            frame_map = np.zeros((1, len(R_grids), len(theta_grids), len(z_grids)))
+            frame_map = np.zeros((1, len(R_grids) - 1, len(theta_grids), len(z_grids)))
             R_coordinates, theta_coordinates = cartesian_to_cylindrical(coords[:,0], coords[:,1])
             cylindrical_coordinates = np.concatenate([R_coordinates.reshape(-1,1),
                                                     theta_coordinates.reshape(-1,1),
                                                     coords[:,2].reshape(-1,1)], axis=1)
             R_closest, theta_closest, z_closest = map_to_grid_points(cylindrical_coordinates, R_grids.reshape(-1,1),
                                                                     theta_grids.reshape(-1,1), z_grids.reshape(-1,1))
-            R_within_range = np.where(R_closest != n_R)[0]
+            R_within_range = np.where(R_closest != len(R_grids) - 1)[0] # Filter out atoms that are not within radius
             np.add.at(frame_map, (0, R_closest[R_within_range],
                                 theta_closest[R_within_range],
                                 z_closest[R_within_range]), 1)
@@ -110,6 +110,8 @@ def create_maps(X, R_grids, theta_grids, z_grids, volumes, normalization="within
                     frame_map /= len(R_within_range)
             elif normalization == "all":
                 frame_map /= len(coords)
+            elif not normalization:
+                pass
             else:
                 print(f"Normalization {normalization} not known! Use either 'within' or 'all'.")
                 break
