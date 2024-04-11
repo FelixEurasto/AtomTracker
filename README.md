@@ -55,7 +55,7 @@ To make density, movies you need to define the following variables:
 | `movie_length*` | Length of movie in seconds | `5` |
 | `function_min_and_max*` | Tuple containing the range of function values for which atom densities are interpolated (there will be `movie_n_frames` interpolations) | (0,1) |
 
-
+Making movies might take some minutes per map selection, of course depending on the number of frames.
 
 
 
