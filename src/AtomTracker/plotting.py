@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def make_radial_plot(maps, R_min, R_max, vmax, title):
+def make_radial_plot(maps, R_min, R_max, vmax, title, cmap="Reds"):
     """
     Plots mean position maps for 3 sections along the z-direction
     Parameters:
@@ -28,10 +28,12 @@ def make_radial_plot(maps, R_min, R_max, vmax, title):
     rad = np.linspace(R_min, R_max, n_R)
     azm = np.linspace(0, 2 * np.pi, n_theta)
     r, th = np.meshgrid(rad, azm)
-    ax[0].pcolormesh(th, r, lower_map, cmap="Reds", vmin=0, vmax=vmax)
-    ax[1].pcolormesh(th, r, middle_map, cmap="Reds", vmin=0, vmax=vmax)
-    ax[2].pcolormesh(th, r, upper_map, cmap="Reds", vmin=0, vmax=vmax)
-
+    ax[0].contourf(th, r, lower_map, cmap=cmap, vmin=0, vmax=vmax)
+    ax[1].contourf(th, r, middle_map, cmap=cmap, vmin=0, vmax=vmax)
+    ax[2].contourf(th, r, upper_map, cmap=cmap, vmin=0, vmax=vmax)
+    for a in ax:
+        a.set_thetagrids([], [])
+        a.set_rticks([])
     ax[0].set_title("Lower")
     ax[1].set_title("Central")
     ax[2].set_title("Upper")

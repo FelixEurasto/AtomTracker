@@ -16,12 +16,18 @@ def make_cylindrical_grid(R_min, R_max, z_min, z_max, n_R, n_theta, n_z):
         R_grids -- np.ndarray: Values of grid points in R-direction
         theta_grids -- np.ndarray: Values of grid points in theta-direction
         z_grids -- np.ndarray: Values of grid points in z-direction
+        volumes -- np.ndarray: Volumes of voxels corresponding to each R-value
     """
     R_grids = np.linspace(R_min, R_max, n_R)
     z_grids = np.linspace(z_min, z_max, n_z)
     theta_grids = np.linspace(0, 2*np.pi, n_theta)
-    
-    return R_grids, theta_grids, z_grids
+    theta_diff = theta_grids[1] - theta_grids[0]
+    areas = [1, theta_diff/2 * R_grids[1]**2]
+    for i in range(2, n_R - 1):
+        areas.append(theta_diff/2 * (R_grids[i]**2 - R_grids[i - 1]**2)) 
+    volumes = (z_grids[1] - z_grids[0]) * np.array(areas)
+
+    return R_grids, theta_grids, z_grids, volumes
 
 
 def cartesian_to_cylindrical(X, Y):
@@ -83,17 +89,12 @@ def map_to_grid_points(coordinates, R_vals, theta_vals, z_vals):
     
     return R_closest, theta_closest, z_closest
 
-def create_maps(X, R_min, R_max, n_R, n_theta, n_z, normalization="within"):
+def create_maps(X, R_grids, theta_grids, z_grids, volumes, normalization="within"):
     
     if X.size != 0:
-        z_coordinates = X[:,:,2]
-        z_min, z_max = z_coordinates.min(), z_coordinates.max()
         maps = []
-        R_grids, theta_grids, z_grids = make_cylindrical_grid(R_min=R_min, R_max=R_max, z_min=z_min,
-                                                            z_max=z_max, n_R=n_R + 1,
-                                                            n_theta=n_theta, n_z=n_z)
         for coords in X:
-            frame_map = np.zeros((1, n_R, n_theta, n_z))
+            frame_map = np.zeros((1, len(R_grids), len(theta_grids), len(z_grids)))
             R_coordinates, theta_coordinates = cartesian_to_cylindrical(coords[:,0], coords[:,1])
             cylindrical_coordinates = np.concatenate([R_coordinates.reshape(-1,1),
                                                     theta_coordinates.reshape(-1,1),
@@ -111,6 +112,8 @@ def create_maps(X, R_min, R_max, n_R, n_theta, n_z, normalization="within"):
                 frame_map /= len(coords)
             else:
                 print(f"Normalization {normalization} not known! Use either 'within' or 'all'.")
+                break
+            frame_map /= volumes.reshape(1,-1,1,1)
             maps.append(frame_map)
         maps = np.concatenate(maps, axis=0)
         return maps

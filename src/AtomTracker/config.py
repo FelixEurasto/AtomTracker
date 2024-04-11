@@ -2,36 +2,37 @@
 
 # Define list of paths where the trajectories are. Can use '*' to select recursively.
 traj_paths = [
-    #"/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/chol-sdpc/a100/epoch*/rep*/solu_memb_centered.xtc",
+    "/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/chol-sdpc/a100/epoch01/rep*/solu_memb_centered.xtc",
     #"/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/chol/a100/epoch*/rep*/solu_memb_centered.xtc",
-    "/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/sdpc/a100/epoch*/rep*/solu_memb_centered.xtc",
-    "/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/popc/a100/epoch*/rep*/solu_memb_centered.xtc"
+    #"/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/sdpc/a100/epoch*/rep*/solu_memb_centered.xtc",
+    #"/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/popc/a100/epoch*/rep*/solu_memb_centered.xtc"
 ]
 
 # Define list of gro/pdb file paths in corresponding order with trajectory dirs.
 gro_paths = [
-    #"/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/chol-sdpc/a100/epoch01/rep01/solu_memb.gro",
+    "/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/chol-sdpc/a100/epoch01/rep01/solu_memb.gro",
     #"/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/chol/a100/epoch01/rep01/solu_memb.gro",
-    "/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/sdpc/a100/epoch01/rep01/solu_memb.gro",
-    "/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/popc/a100/epoch01/rep01/solu_memb.gro"
+    #"/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/sdpc/a100/epoch01/rep01/solu_memb.gro",
+    #"/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/popc/a100/epoch01/rep01/solu_memb.gro"
 ]
 
 # Define list of paths to which position data will be saved.
 save_paths = [
-    #"/wrk/eurastof/mapper/data/chol-sdpc/",
-    #"/wrk/eurastof/mapper/data/chol/",
-    "/wrk/eurastof/mapper/data/sdpc/",
-    "/wrk/eurastof/mapper/data/popc/"
+    "/wrk/eurastof/mapper/data/testing/",
+    #"/wrk/eurastof/mapper/data/chol-volum-norm-fit-headgroups/",
+    #"/wrk/eurastof/mapper/data/sdpc-volum-norm-fit-headgroups/",
+    #"/wrk/eurastof/mapper/data/popc-volum-norm-fit-headgroups/"
 ]
 
 ########### POSITION MAP SETTINGS ###########
 
 map_selections = ["resname CHL1", "resname SDPC", "resname POPC"] # Selections for which maps are calculated
-other_selections = ["name CA"] # Selections for which coordinates corresponding to maps are calculated. Set to None if not needed.
+other_selections = ["protein and not name H and not type H", "name CA"] # Selections for which coordinates corresponding to maps are calculated. Set to None if not needed.
 
 # Reference structure used for alignment at each timestep of each simulation. If None, each trajectory will be aligned with its first frame.
 reference_structure = "/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/chol-sdpc/a100/epoch01/rep01/solu_memb.gro"
-alignment_selection = "name CA" # selection used to align each ts to reference structure
+alignment_selection = "name CA and not resid 199-235 and not resid 298-311 and not resid 265-275 and not resid 135-165 and not resid 105-115 and not resid 60-75 and not resid 29-36" # selection used to align each ts to reference structure
+fit_structures = True # Whether to align frames to reference_structure, using alignment_selection.
 centering_selection = "protein" # selection whose COM is centered to origin at each frame
 
 R_min = 0 # Minimum radial distance from origin in xy-plane
@@ -39,9 +40,8 @@ R_max = 30 # Maximum radial distance from origin in xy-plane
 n_R = 30 # Number of grid points in R-direction
 n_z = 30 # Number of grid points in z-direction
 n_theta = 30 # Number of grid points in theta-direction
-use_com = False # Whether to use the COMs of selections when calculating position maps
-# Normalization method. 'within' normalizes each frame's map to sum to 1. 'all' normalizes each frame's map by the total number of atoms in the map selection.
-normalization = "within" 
+# Normalization method. 'within' normalizes each frame's map by the number of atoms within R_max. 'all' normalizes each frame's map by the total number of atoms in the map selection.
+normalization = "all"
 
 skip = 10 # Number of frames to skip 
 
