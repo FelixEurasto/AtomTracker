@@ -1,6 +1,6 @@
 # A tool to build density maps of atoms from MD simulations
 
-![alt text](http://url/to/img.png)
+![alt text](resname_CHL1_densities.png)
 
 ## Required Python Modules
 - NumPy
