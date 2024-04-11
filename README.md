@@ -9,7 +9,7 @@
 
 ## Usage
 
-All of the required settings are defined in /src/AtomTracker/config.py. Variables with `*` cannot be `None`.
+All of the required settings are defined in /src/AtomTracker/config.py. Variables marked with `*` cannot be `None`.
 
 First, define the directory paths from which the simulation trajectories and corresponding .gro/.pdb files are fetched.
 
@@ -57,6 +57,7 @@ To make density, movies you need to define the following variables:
 
 Making movies might take some minutes per map selection, of course depending on the number of frames.
 
+Below is an example of these movies. Here cholesterol densities around the beta-2 adrenergic receptor are being interpolated for different values of the $\mathrm{A}^{100}$ activation index.
 
 
 
