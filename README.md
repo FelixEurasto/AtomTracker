@@ -2,7 +2,7 @@
 
 
 ## Python Modules
-NumPy
-matplotlib
-MDAnalysis
-scikit-learn
+- NumPy
+- matplotlib
+- MDAnalysis
+- scikit-learn
