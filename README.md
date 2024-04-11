@@ -49,6 +49,7 @@ The movies are structured such that the z-dimension of the system is split in 3,
 To make density, movies you need to define the following variables:
 
 | Variable | Description | Default value |
+| --- | - | - |
 | `create_movies*` | Whether to create movies | `False` |
 | `movie_n_frames*` | Number of frames in the movie | `100` |
 | `movie_length*` | Length of movie in seconds | `5` |
