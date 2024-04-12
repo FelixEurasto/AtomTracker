@@ -4,9 +4,11 @@
 
 ## Required Python Modules
 - NumPy
+- SciPy
 - matplotlib
 - MDAnalysis
 - scikit-learn
+- glob
 
 ## Usage
 
