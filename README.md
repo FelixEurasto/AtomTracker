@@ -12,14 +12,16 @@
 
 ## Usage
 
+After defining the required settings, you can run `/src/main.py`. The result of this script will be density maps of each desired atom group for each frame of the simulations. In addition, optional corresponding function values and other selection coordinates will be saved into separate arrays. The script also saves `.png` files of the mean density maps of each atom group, partitioned into 3 sections along the z-coordinate. Each section of these will have approximately equal total density. 
+
 All of the required settings are defined in /src/AtomTracker/config.py. Variables marked with `*` cannot be `None`.
 
-First, define the directory paths from which the simulation trajectories and corresponding .gro/.pdb files are fetched.
+First, define the directory paths from which the simulation trajectories and corresponding `.gro`/`.pdb` files are fetched.
 
 | Variable | Description | Default value |
 | --- | - | - |
-| `traj_paths*` | List of paths from which to fetch .xtc files |  - |
-| `gro_paths*` | List of paths from which to fetch corresponding .gro/.pdb files | - |
+| `traj_paths*` | List of paths from which to fetch `.xtc` files |  - |
+| `gro_paths*` | List of paths from which to fetch corresponding `.gro`/`.pdb` files | - |
 | `save_paths*` | List of paths to which the corresponding results are saved | - |
 
 
@@ -29,7 +31,7 @@ Next, define all settings needed for the calculations of the density maps.
 | --- | - | - |
 | `map_selections*` | List of MDAnalysis selection strings for which density maps are calculated |  - |
 | `other_selections` | List of MDAnalysis selection strings for which coordinates are saved at every frame. | `None` |
-| `reference_structure` | Path to .gro/.pdb file which will be used as reference structure for fitting. If `None` and `fit_structures` is `True`, each frame will be aligned to the first frame in its trajectory. | `None` |
+| `reference_structure` | Path to `.gro`/`.pdb` file which will be used as reference structure for fitting. If `None` and `fit_structures` is `True`, each frame will be aligned to the first frame in its trajectory. | `None` |
 | `alignment_selection` | MDAnalysis selection string that is used to align each frame to `reference_structure`, if `fit_structures` is `True` | `None` |
 | `fit_structures*` | Whether to use `alignment_selection` to fit every frame to `reference_structure` | `False` |
 | `centering_selection*` | MDAnalysis string of structure whose center of mass (COM) is shifted to the origin (center of the grid) on each frame | - |
