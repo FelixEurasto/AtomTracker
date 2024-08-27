@@ -5,7 +5,7 @@ from MDAnalysis.analysis import align
 
 def calculate_positions(universe, map_selections, skip=1, fit_structures=False,
                         reference_structure=None, other_selections=None,
-                        centering_selection=None, alignment_selection=None):
+                        centering_selection=None, alignment_selection=None, verbose=False):
     coordinates = dict([(sel, []) for sel in map_selections])
     atoms = dict([(sel, universe.select_atoms(sel)) for sel in map_selections])
     
@@ -21,6 +21,8 @@ def calculate_positions(universe, map_selections, skip=1, fit_structures=False,
     ref_struct.atoms.positions -= ref_struct.select_atoms(centering_selection).center_of_mass()
 
     for ts in universe.trajectory[::skip]:
+        if verbose:
+            print(f"At frame {ts.frame+1}/{universe.trajectory.n_frames}", end="\r")
         if fit_structures:
             align.alignto(universe, ref_struct, select=alignment_selection)
         else:

@@ -1,5 +1,11 @@
 import numpy as np
 import scipy
+from ..AtomTracker import position_calculations
+from ..AtomTracker import plotting
+import MDAnalysis as mda
+from MDAnalysis.analysis import align
+import os
+from collections import defaultdict
 
 def make_cylindrical_grid(R_min, R_max, z_min, z_max, n_R, n_theta, n_z):
     """
@@ -89,11 +95,12 @@ def map_to_grid_points(coordinates, R_vals, theta_vals, z_vals):
     
     return R_closest, theta_closest, z_closest
 
-def create_maps(X, R_grids, theta_grids, z_grids, volumes, normalization="within"):
+def create_maps(X, R_grids, theta_grids, z_grids, volumes, normalization="within", verbose=False):
     
     if X.size != 0:
         maps = []
-        for coords in X:
+        for INDEX, coords in enumerate(X):
+            print(f"At map {INDEX+1}/{len(X)}", end="\r")
             frame_map = np.zeros((1, len(R_grids) - 1, len(theta_grids), len(z_grids)))
             R_coordinates, theta_coordinates = cartesian_to_cylindrical(coords[:,0], coords[:,1])
             cylindrical_coordinates = np.concatenate([R_coordinates.reshape(-1,1),
@@ -122,4 +129,147 @@ def create_maps(X, R_grids, theta_grids, z_grids, volumes, normalization="within
     else:
         return None
 
+
+class Mapper():
+    def __init__(
+                self,
+                save_path,
+                map_selections,
+                other_selections,
+                ref_structure,
+                alignment_selection,
+                fit_structures,
+                centering_selection,
+                function,
+                R_min,
+                R_max,
+                n_R=30,
+                n_theta=30,
+                n_z=30,
+                normalization=None,
+                skip=1
+                ):
+        self.map_selections = map_selections
+        self.save_path = save_path
+        self.other_selections = other_selections
+        self.ref_structure = ref_structure
+        self.alignment_selection = alignment_selection
+        self.fit_structures = fit_structures
+        self.centering_selection = centering_selection
+        self.function = function
+        self.R_min = R_min
+        self.R_max = R_max
+        self.n_R = n_R
+        self.n_theta = n_theta
+        self.n_z = n_z
+        self.normalization = normalization
+        self.skip = skip
+        self.maps = None
+        self.fvals = None
+        self.other_coordinates = None
+        self.R_grids = None
+        self.theta_grids = None
+        self.z_grids = None
+    
+    def run(self, universe, verbose=True):
+        if not os.path.isdir(self.save_path):
+            print(f"Directory {self.save_path} not found, creating it now ...")
+            os.makedirs(self.save_path)
+        if verbose:
+            print(f"Calculating coordinate info ...")
+        if self.ref_structure:
+            ref_struct = mda.Universe(self.ref_structure)
+        else:
+            ref_struct = self.universe.copy()
+        ref_struct.atoms.positions -= ref_struct.select_atoms(self.centering_selection).center_of_mass()
+        all_selections = " or ".join(self.map_selections)
+        atoms = universe.select_atoms(all_selections)
+        if atoms.n_atoms > 0:
+            z_min_max = []
+            for ts in universe.trajectory[::int(universe.trajectory.n_frames / 100)]:
+                if self.fit_structures:
+                    align.alignto(universe, ref_struct, select=self.alignment_selection)
+                else:
+                    universe.atoms.positions -= universe.select_atoms(self.centering_selection).center_of_mass()
+                z_min_max.append(atoms.positions[:,2].min())
+                z_min_max.append(atoms.positions[:,2].max())
+            z_min = np.min(z_min_max)
+            z_max = np.max(z_min_max)
+            R_grids, theta_grids, z_grids, volumes = make_cylindrical_grid(R_min=self.R_min, R_max=self.R_max,
+                                                                                z_min=z_min, z_max=z_max,
+                                                                                n_R=self.n_R + 1, n_theta=self.n_theta,
+                                                                                n_z=self.n_z)
+            self.R_grids = R_grids
+            self.theta_grids = theta_grids
+            self.z_grids = z_grids
+            maps = defaultdict(np.ndarray)
+
+            coordinates = position_calculations.calculate_positions(universe=universe,
+                                                map_selections=self.map_selections,
+                                                skip=self.skip, fit_structures=self.fit_structures,
+                                                reference_structure=self.ref_structure,
+                                                other_selections=self.other_selections,
+                                                centering_selection=self.centering_selection,
+                                                alignment_selection=self.alignment_selection,
+                                                verbose=verbose)
+
+            for sel in self.map_selections:
+                if verbose:
+                    print(f"Calculating density maps for selection '{sel}' ...")
+                X = coordinates[sel]
+                sel_maps = create_maps(X=X,
+                                        R_grids=R_grids,
+                                        theta_grids=theta_grids,
+                                        z_grids=z_grids,
+                                        volumes=volumes,
+                                        normalization=self.normalization,
+                                        verbose=verbose)
+                if sel_maps is not None: # Check if map for this selection exists
+                    maps[sel] = sel_maps
+
+            if self.other_selections:
+                self.other_coordinates = dict([(sel, coordinates[sel]) for sel in self.other_selections if coordinates[sel].size > 0])
+            
+            if verbose: 
+                print(f"Calculating function values ...")
+            if self.function:
+                fvals = np.array([self.function(universe) for ts in universe.trajectory[::self.skip]])
+                self.fvals = fvals
+
+            if len(maps.keys()) > 0:
+                self.maps = maps
+            if self.save_path:
+                if verbose:
+                    print(f"Saving data into {self.save_path} ...")
+                self.save_data()
+            print("Done!")
+        else:
+            print(f"None of {','.join(self.map_selections)} found in this Universe!")
+        return self
+
+    def save_data(self):
+        if self.maps is not None:
+            for selection, data in self.maps.items():
+                np.save(f"{self.save_path}/{selection.replace(' ', '_')}_maps.npy", data)
+        if self.fvals is not None:
+            if self.fvals.size > 0:
+                np.save(f"{self.save_path}/function_values.npy", self.fvals)
+        if self.other_coordinates is not None:
+            for selection, data in self.other_coordinates.items():
+                np.save(f"{self.save_path}/{selection.replace(' ', '_')}_coordinates.npy", data)
+
+    def interactive_3d(self, density_sel, coordinates, fval_range=(-10,10), n_frames=21, threshold=0.4, res=(10,10,10)):
+        densities = self.maps[density_sel]
+        fig = plotting._3d_plot(maps=densities,
+                                coordinates=coordinates,
+                                fvals=self.fvals,
+                                R_grids=self.R_grids,
+                                theta_grids=self.theta_grids,
+                                z_grids=self.z_grids,
+                                res=res,
+                                fval_range=fval_range,
+                                n_frames=n_frames,
+                                threshold=threshold,
+                                title=density_sel)
+        fig.show()
 

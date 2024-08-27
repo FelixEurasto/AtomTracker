@@ -3,17 +3,14 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 plt.rcParams["font.family"] = "serif"
 
-def density_movie(true_densities, density_interpolations, function_values, R_min, R_max,
-                  vmax=1e-5, save_file="./movie.mp4", interval=10, title="densities"):
+def density_movie(density_interpolations, function_values, R_grids, theta_grids,
+                  vmax=1e-5, save_file="./movie.mp4", interval=10, title="densities", z_bins=None):
 
-    total_density = true_densities.sum()
-    z_low_ind = [i for i in range(true_densities.shape[-1]) if true_densities[:,:,:,:i].sum() >= total_density/3][0]
-    z_middle_ind = [i for i in range(true_densities.shape[-1]) if true_densities[:,:,:,:i].sum() >= 2*total_density/3][0]
-    z_bins = [z_low_ind, z_middle_ind]
 
-    rad = np.linspace(R_min, R_max, density_interpolations.shape[1])
-    azm = np.linspace(0, 2 * np.pi, density_interpolations.shape[2])
-    r, th = np.meshgrid(rad, azm)
+    if not z_bins: # If z_bins is None, use approximately equal partition
+        z_bins = [density_interpolations.shape[-1]//3, 2*density_interpolations.shape[-1]//3]
+
+    r, th = np.meshgrid(R_grids, theta_grids)
 
     fig = plt.figure(figsize=(6, 2), dpi=200)
     for i in range(1, 4):
@@ -48,14 +45,14 @@ def density_movie(true_densities, density_interpolations, function_values, R_min
         interp_upper = density_interpolations[frame,:,:,z_bins[1]:].mean(axis=2).T
 
 
-        fig.axes[0].contourf(th, r, interp_low, vmax=vmax, vmin=0, cmap="Reds")
-        fig.axes[1].contourf(th, r, interp_middle, vmax=vmax, vmin=0, cmap="Reds")
-        fig.axes[2].contourf(th, r, interp_upper, vmax=vmax, vmin=0, cmap="Reds")
+        fig.axes[0].contourf(th, r, interp_low, cmap="Reds", vmin=0, vmax=vmax)
+        fig.axes[1].contourf(th, r, interp_middle, cmap="Reds", vmin=0, vmax=vmax)
+        fig.axes[2].contourf(th, r, interp_upper, cmap="Reds", vmin=0, vmax=vmax)
         
         suptitle.set_text(frame_titles[frame])
         return suptitle, fig.axes
 
     ani = FuncAnimation(fig, update, frames=len(density_interpolations), interval=interval)
     fig.tight_layout()
-    ani.save(save_file)
+    ani.save(save_file, writer="imagemagick")
     return ani

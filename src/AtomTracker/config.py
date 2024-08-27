@@ -2,32 +2,32 @@
 
 # Define list of paths where the trajectories are. Can use '*' to select recursively.
 traj_paths = [
-    "/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/chol-sdpc/a100/epoch*/rep*/solu_memb_centered.xtc",
-    #"/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/chol/a100/epoch*/rep*/solu_memb_centered.xtc",
-    #"/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/sdpc/a100/epoch*/rep*/solu_memb_centered.xtc",
-    #"/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/popc/a100/epoch*/rep*/solu_memb_centered.xtc"
+    "/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/chol-sdpc/a100/epoch*/rep*/mdrun.xtc",
+    #"/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/chol/a100/epoch*/rep*/mdrun.xtc",
+    #"/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/sdpc/a100/epoch*/rep*/mdrun.xtc",
+    #"/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/popc/a100/epoch*/rep*/mdrun.xtc"
 ]
 
 # Define list of gro/pdb file paths in corresponding order with trajectory dirs.
 gro_paths = [
-    "/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/chol-sdpc/a100/epoch01/rep01/solu_memb.gro",
-    #"/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/chol/a100/epoch01/rep01/solu_memb.gro",
-    #"/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/sdpc/a100/epoch01/rep01/solu_memb.gro",
-    #"/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/popc/a100/epoch01/rep01/solu_memb.gro"
+    "/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/chol-sdpc/a100/epoch01/rep01/mdrun.gro",
+    #"/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/chol/a100/epoch01/rep01/mdrun.gro",
+    #"/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/sdpc/a100/epoch01/rep01/mdrun.gro",
+    #"/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/popc/a100/epoch01/rep01/mdrun.gro"
 ]
 
 # Define list of paths to which position data will be saved.
 save_paths = [
-    "/wrk/eurastof/AtomTracker/data/testing/",
-    #"/wrk/eurastof/mapper/data/chol-volum-norm-fit-headgroups/",
-    #"/wrk/eurastof/mapper/data/sdpc-volum-norm-fit-headgroups/",
-    #"/wrk/eurastof/mapper/data/popc-volum-norm-fit-headgroups/"
+    "/wrk/eurastof/AtomTracker/data/chol-sdpc-full-system/",
+    #"/wrk/eurastof/AtomTracker/data/chol-full-system/",
+    #"/wrk/eurastof/AtomTracker/data/sdpc-full-system/",
+    #"/wrk/eurastof/AtomTracker/data/popc-full-system/"
 ]
 
 ########### DENSITY MAP SETTINGS ###########
 
-map_selections = ["resname CHL1", "resname SDPC", "resname POPC"] # Selections for which maps are calculated
-other_selections = ["protein and not name H and not type H", "name CA"] # Selections for which coordinates corresponding to maps are calculated. Set to None if not needed.
+map_selections = ["resname TIP3", "resname SOD", "resname CLA"] # Selections for which maps are calculated
+other_selections = ["name CA"] # Selections for which coordinates corresponding to maps are calculated. Set to None if not needed.
 
 # Reference structure used for alignment at each timestep of each simulation. If None, each trajectory will be aligned with its first frame.
 reference_structure = "/wrk/eurastof/binding_spots_project/gpcr_sampling/b2ar-fst/chol-sdpc/a100/epoch01/rep01/solu_memb.gro"
@@ -44,7 +44,7 @@ n_z = 30 # Number of grid points in z-direction
 # 'all' normalizes each frame's map by the total number of atoms in the map selection.
 # If None, no normalization based on atom count is performed
 normalization = "all"
-skip = 10 # Number of frames to skip 
+skip = 50 # Number of frames to skip 
 
 ########### FUNCTION DEFINITION ###########
 
@@ -69,7 +69,13 @@ def calculate_function(universe):
 
 function = calculate_function # Set function = None if you do not wish to calculate any function
 
-### PLS MOVIE CREATION ###
+########### PLOTTING & PLS MOVIE CREATION ###########
+
+# iterable containing z-dimension cut-offs used for partitioning the density maps for the plots and movies.
+# For example, z_bins = [10, 20] will use the density in grids below index 10 as the lower section,
+# the density between indices 10 and 20 as the middle section, and the density above index 20 as the upper section.
+# If None, the z-direction will be partitioned into 3 (approximately) equal sections.
+z_bins = [13, 19]
 
 create_movies = True # Whether to create PLS movies
 movie_n_frames = 500 # Number of frames in created movies
