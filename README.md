@@ -47,7 +47,7 @@ If `function` is not `None`, you can optionally create movies showing the trends
 
 The movies are structured such that the z-dimension of the system is split in 3, producing a "lower section", "central section", and "upper section". The density shifts in all of these regions are animated separately. These movies are calculated separately for each selection in `map_selections`.
 
-To make density, movies you need to define the following variables:
+To make density movies you need to define the following variables:
 
 | Variable | Description | Default value |
 | --- | - | - |
@@ -56,9 +56,9 @@ To make density, movies you need to define the following variables:
 | `movie_length*` | Length of movie in seconds | `5` |
 | `function_min_and_max*` | Tuple containing the range of function values for which atom densities are interpolated (there will be `movie_n_frames` interpolations) | (0,1) |
 
-Making movies might take some minutes per map selection, of course depending on the number of frames.
+Making movies might take some minutes per map selection, of course, depending on the number of frames.
 
-Below is an example of these movies. Here cholesterol densities around the beta-2 adrenergic receptor are being interpolated for different values of the $\mathrm{A}^{100}$ activation index.
+Below is an example of these movies. Here, cholesterol densities around the beta-2 adrenergic receptor are being interpolated for different values of the $\mathrm{A}^{100}$ activation index.
 
 
 ![](chol-densities.gif)
